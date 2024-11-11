@@ -1,39 +1,87 @@
 <template>
   <div class="home-page">
-    <h2 class="page-title">Все заметки</h2>
-    <ul class="notes">
-      <li v-for="(note, index) in notes" :key="index" class="note-item">
-        <strong>{{ note.name }}</strong
-        >: {{ note.content }}
-        <p class="last-edited">
-          Последнее редактирование: {{ note.lastEdited }}
-        </p>
-      </li>
+    <h2 class="home-page-title">Все заметки</h2>
+    <div class="filter-dates">
+      <label for="start-date">Начальная дата:</label>
+      <input
+        type="date"
+        id="start-date"
+        v-model="localFilterStartDate"
+        @change="updateFilterStartDate"
+      />
+      <label for="end-date">Конечная дата:</label>
+      <input
+        type="date"
+        id="end-date"
+        v-model="localFilterEndDate"
+        @change="updateFilterEndDate"
+      />
+    </div>
+    <ul class="notes-list">
+      <NoteItem v-for="note in filteredNotes" :key="note.id" :note="note" />
     </ul>
+    <h3 v-if="isNotesEmpty">Нет подходящих заметок 😢</h3>
   </div>
 </template>
 
 <script>
+import { mapState, mapActions, mapGetters } from "vuex";
+import NoteItem from "@/components/NoteItem/NoteItem.vue";
+
 export default {
-  name: "home-page",
-  props: {
-    notes: Array,
+  name: "HomePage",
+  components: {
+    NoteItem,
+  },
+  data() {
+    return {
+      localFilterStartDate: null,
+      localFilterEndDate: null,
+    };
+  },
+  computed: {
+    ...mapState(["notes"]),
+    ...mapGetters(["filteredNotes"]),
+    isNotesEmpty() {
+      return this.filteredNotes.length === 0;
+    },
+  },
+  methods: {
+    ...mapActions(["setFilterStartDate", "setFilterEndDate"]),
+    updateFilterStartDate() {
+      this.setFilterStartDate(this.localFilterStartDate);
+    },
+    updateFilterEndDate() {
+      this.setFilterEndDate(this.localFilterEndDate);
+    },
   },
 };
 </script>
 
 <style scoped>
 .home-page {
-  font-family: "Arial", sans-serif;
-  padding: 20px;
+  padding: 20px 0px;
 }
 
-.page-title {
+.home-page-title {
   color: #333;
   margin-bottom: 20px;
 }
 
-.notes {
+.filter-dates {
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.filter-dates label {
+  margin-right: 10px;
+}
+
+.filter-dates input {
+  margin-right: 20px;
+}
+
+.notes-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   justify-content: space-between;
@@ -42,35 +90,22 @@ export default {
   list-style-type: none;
 }
 
-.note-item {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-}
-
-.note-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.last-edited {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 10px;
-}
-
 @media (max-width: 768px) {
-  .notes {
+  .notes-list {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .notes {
+  .notes-list {
     grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .filter-dates {
+    flex-direction: column;
+    gap: 10px;
   }
 }
 </style>
