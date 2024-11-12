@@ -37,7 +37,7 @@ export default {
   methods: {
     ...mapActions(["addNote"]),
     submitForm() {
-      if (!this.note.name || !this.note.content) {
+      if (this.note.name.trim() == "" || this.note.content.trim() == "") {
         this.errorMessage = "Пожалуйста, заполните все поля.";
         setTimeout(() => {
           this.errorMessage = "";
