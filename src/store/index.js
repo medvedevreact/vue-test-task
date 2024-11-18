@@ -123,13 +123,18 @@ export default new Vuex.Store({
   getters: {
     notes: (state) => state.notes,
     filteredNotes: (state) => {
-      console.log("fire");
       if (!state.filterStartDate && !state.filterEndDate) {
         return state.notes;
       }
 
       return state.notes.filter((note) => {
-        const noteDate = new Date(note.lastEdited);
+        const noteDate = new Date(
+          `${note.lastEdited.substring(6, 10)}-${note.lastEdited.substring(
+            3,
+            5
+          )}-${note.lastEdited.substring(0, 2)}`
+        );
+
         const startDate = state.filterStartDate
           ? new Date(state.filterStartDate)
           : null;
